@@ -50,25 +50,56 @@ for n=1:Particles
     end
 end
 
+%Background Color Map
+map=[];
+for i=1:200
+        temp=[0.5, 0, 0.7]./i;
+        map=[temp; map];
+end
+C=zeros(83, 83); t0=12;
+[gridx, gridy]=meshgrid([-41:41], [-41:41]);
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%% Iterate %%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 time=0:dt:run_time;
-fig=figure('Position', [100, 50, 800, 720], 'color', [0.1, 0.1, 0.1]);
+fig=figure('Position', [100, 50, 800, 720], 'color', [0, 0, 0]);
 %2D Animation
 if D==2
+    C=rand([81, 81]).^200;
     for t=time
+ 
+        if round(mod(t,t0), 1) == 0
+            C0=rand(83, 83); C0(83,83)=1;
+            C=C0.^15;
+            tc=0;
+            end
+        tc=tc+dt;
+        if tc < t0/2-2 && mean(mean(C)) < mean(mean(C0))
+            C=C.^0.99;
+        end
+        if tc > t0/2+2
+            C=C.^1.02;
+        end
+        
         [x, v] = BSCS_Dynamics(x, v, dt, M, x0);
-    
-        plot(x0(1), x0(2), 'wo', 'linewidth', 6*M/M0); hold on
-        plot(x(1,:), x(2,:), 'o', 'linewidth', 1, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', [0.9, 0, 0]); hold on
+        
+        pcolor(gridx, gridy, C); colormap(map); hold on
+        plot(x0(1), x0(2), 'wo', 'linewidth', 8*M/M0); hold on
+        plot(x(1,:), x(2,:), 'o', 'linewidth', 1, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', [0.5, 0, 0.7]); hold on
         set(gca, 'Color', [0.1, 0.1, 0.1])
         axis([-40, 40, -40, 40]); axis off
         pause(dt) 
         hold off 
     end
 end
+
+
+
+
+
+
 %3D Animation
 if D==3
     for t=time
@@ -83,3 +114,66 @@ if D==3
         hold off
     end
 end
+
+
+%%
+
+clear all
+close all
+clc
+
+figure
+[gridx, gridy]=meshgrid([-41:41], [-41:41]);
+
+dt=0.0333;
+time=0:dt:50;
+t0=15;
+
+map=[];
+for i=1:50
+    temp=[0.5, 0, 0.7]./i;
+    map=[temp; map];
+end
+
+C=zeros(83, 83);
+for t=time
+    if round(mod(t,t0), 1) == 0
+        C0=rand(83, 83);
+        C0=C0-0.1*(C0>0.9);  C0(83,83)=1
+        C=C0.^;
+        [mean(mean(C0)), mean(mean(C))] %Test
+        tc=0;
+    end
+    tc=tc+dt;
+    if tc < t0/2 && mean(mean(C)) < mean(mean(C0))
+    C=C.^0.9;
+    mean(mean(C))
+ 
+    end
+%     if tc > t0/2
+%     C=C.^1.02;
+%     mean(mean(C));
+%     end
+    pcolor(gridx, gridy, C); colormap(map); hold on
+    pause(dt)
+end
+
+    
+    
+  %%
+  close all 
+  clear all
+  
+  map=[];
+for i=1:100
+        temp=[0.5, 0, 0.7]./i;
+        map=[temp; map];
+end
+  [gridx, gridy]=meshgrid([-41:41], [-41:41]);
+  
+  C=randi([0,900],83)/1000; C0(83,83)=1;
+  figure
+  pcolor(gridx, gridy, C); colormap(map);
+  
+  
+  pcolor(gridx, gridy, C); colormap(map)
