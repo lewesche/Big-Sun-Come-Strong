@@ -52,11 +52,12 @@ end
 
 %Background Color Map
 map=[];
-for i=1:200
-        temp=[0.5, 0, 0.7]./i;
-        map=[temp; map];
+map=[];
+for i=logspace(0, 1.5, 100)
+    temp=[0.5, 0, 0.7]/i;
+    map=[temp; map];
 end
-C=zeros(83, 83); t0=12;
+C=zeros(83, 83); t0=1; s=10000;
 [gridx, gridy]=meshgrid([-41:41], [-41:41]);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -67,20 +68,17 @@ time=0:dt:run_time;
 fig=figure('Position', [100, 50, 800, 720], 'color', [0, 0, 0]);
 %2D Animation
 if D==2
-    C=rand([81, 81]).^200;
+    C=zeros([83, 83]); C(83,83)=1;
+    ind=randi([1, 83], 2, s);
+    ind(3,:)=1:length(ind);
     for t=time
  
         if round(mod(t,t0), 1) == 0
-            C0=rand(83, 83); C0(83,83)=1;
-            C=C0.^15;
             tc=0;
-            end
-        tc=tc+dt;
-        if tc < t0/2-2 && mean(mean(C)) < mean(mean(C0))
-            C=C.^0.99;
         end
-        if tc > t0/2+2
-            C=C.^1.02;
+        tc=tc+dt;
+        for i=1:length(ind)
+            C(ind(1,i), ind(2,i))=(0.4*cos(tc/(t0/2)*pi+ind(3,i))+0.6);
         end
         
         [x, v] = BSCS_Dynamics(x, v, dt, M, x0);
@@ -94,10 +92,6 @@ if D==2
         hold off 
     end
 end
-
-
-
-
 
 
 %3D Animation
@@ -126,54 +120,55 @@ figure
 [gridx, gridy]=meshgrid([-41:41], [-41:41]);
 
 dt=0.0333;
-time=0:dt:50;
-t0=15;
+time=0:dt:20;
+t0=1;
+s=50
 
 map=[];
-for i=1:50
-    temp=[0.5, 0, 0.7]./i;
+for i=logspace(0, 1.5, 100)
+    temp=[0.5, 0, 0.7]/i;
     map=[temp; map];
 end
 
-C=zeros(83, 83);
+C=zeros([83, 83]); C(83,83)=1;
+ind=randi([1, 83], 2, s);
+ind(3,:)=1:length(ind)
 for t=time
     if round(mod(t,t0), 1) == 0
-        C0=rand(83, 83);
-        C0=C0-0.1*(C0>0.9);  C0(83,83)=1
-        C=C0.^;
-        [mean(mean(C0)), mean(mean(C))] %Test
         tc=0;
     end
     tc=tc+dt;
-    if tc < t0/2 && mean(mean(C)) < mean(mean(C0))
-    C=C.^0.9;
-    mean(mean(C))
- 
+    for i=1:length(ind)
+        C(ind(1,i), ind(2,i))=(0.4*cos(tc/(t0/2)*pi+ind(3,i))+0.6);
     end
-%     if tc > t0/2
-%     C=C.^1.02;
-%     mean(mean(C));
-%     end
+    [tc, 0.25*cos(tc/(t0/2)*pi+pi)+0.75]
     pcolor(gridx, gridy, C); colormap(map); hold on
     pause(dt)
+    hold off
 end
 
-    
-    
-  %%
-  close all 
-  clear all
-  
-  map=[];
+
+%%
+close all 
+clear all
+clc
+
+map=[];
 for i=1:100
-        temp=[0.5, 0, 0.7]./i;
-        map=[temp; map];
+    temp=[0.5, 0, 0.7]./i;
+    map=[temp; map];
 end
-  [gridx, gridy]=meshgrid([-41:41], [-41:41]);
+[gridx, gridy]=meshgrid([-41:41], [-41:41]);
+
+
+C=zeros([83, 83]); C(83,83)=1;
+ind=randi([1, 83], 2, 15);
+for i=1:length(ind)
+    C(ind(1,i), ind(2,i))=sin(t);
+end
+max(C)
+figure
+pcolor(gridx, gridy, C); colormap(map);
   
-  C=randi([0,900],83)/1000; C0(83,83)=1;
-  figure
-  pcolor(gridx, gridy, C); colormap(map);
-  
-  
-  pcolor(gridx, gridy, C); colormap(map)
+
+
