@@ -6,6 +6,7 @@ close all
 clc
 
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%% Inputs %%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -13,13 +14,13 @@ clc
 M0=800;                         %Obrital Mass
 x0=0; y0=0; z0=0;               %Mass Fixed Location
 Particles=1000;                 %Number of Particles
-dt=0.0333;                      %Time step (sec)
-run_time=240;                   %Run Time (sec)
+dt=1/30;                      %Time step (sec)
+run_time=30;                   %Run Time (sec)
 D=3;                            %Dimesions (2 or 3)
-Tv=60;                          %Time to switch to 3D view (sec)
+Tv=10;                          %Time to switch to 3D view (sec)
 
 
-%Backgrond
+%Backgrond 
 t0=8;                           %Fade Cycle Time
 s=15;                           %Number of Background Points
 trgb=8;                         %Color Change Speed
@@ -78,7 +79,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 time=0:dt:run_time;
-fig=figure('Position', [300, 75, 900, 900], 'color', [0, 0, 0]);
+fig=figure('Position', [100, 25, 826, 786], 'color', [0, 0, 0]); F=[];
 %2D Animation
 if D==2
     %Initialize Background
@@ -139,8 +140,8 @@ if D==3
         for i=1:length(ind)
             plot3(ind(1,i), ind(2,i), ind(3,i), 'd', 'linewidth', 2, 'MarkerFaceColor', [bi*abs(sin(t/trgb)), 0, bi*abs(cos(t/trgb))].*(C(i)).^2, 'MarkerEdgeColor', [bi*abs(sin(t/trgb)), 0, bi*abs(cos(t/trgb))].*(C(i)).^2); hold on
         end
-        plot3(x0(1), x0(2), x0(3), 'wo', 'linewidth', 6*M/M0, 'Color', [abs(sin(t/trgb)), 0, abs(cos(t/trgb))]); hold on
-        plot3(x(1,:), x(2,:), x(3,:), 'o', 'linewidth', 1, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', [abs(sin(t/trgb)), 0, abs(cos(t/trgb))]); hold on
+        plot3(x0(1), x0(2), x0(3), 'o', 'linewidth', 7*M/M0, 'Color', [abs(sin(t/trgb)), 0, abs(cos(t/trgb))]); hold on
+        plot3(x(1,:), x(2,:), x(3,:), 'o', 'linewidth', 1, 'MarkerEdgeColor', [abs(sin(t/trgb)), 0, abs(cos(t/trgb))], 'MarkerFaceColor', [abs(sin(t/trgb)), 0, abs(cos(t/trgb))]); hold on
         set(gca, 'Color', [0, 0, 0])
         axis([-40, 40, -40, 40, -40, 40]); axis off
         %xlabel('x','color', 'w');    ylabel('y','color', 'w');    zlabel('z','color', 'w');
@@ -151,7 +152,16 @@ if D==3
         end
         pause(dt)
         hold off
+        %F=[F, getframe(fig,[0, 0, 780 780])];
+        %F=[F, getframe(fig)];
     end
+
+%     v=VideoWriter('BSCS_Test3.avi','Uncompressed AVI');
+%     v.FrameRate = 30;
+%     v.Quality = 100;
+%     open(v)
+%     writeVideo(v,F)
+%     close(v)
 
 end
 
@@ -165,39 +175,49 @@ clear all
 close all
 clc
 
+ts=70;
+tf=90;
 
-[song, Fs] = audioread('JPEGMAFIA - Black Ben Carson - 07 Motor Mouth.mp3');
+[song, Fs] = audioread('09 Coronus, The Terminator.mp3');
+[song, Fs] = audioread('09 Coronus, The Terminator.mp3', [ts*Fs, tf*Fs]);
 %sound(song, Fs);
 
+r=Fs/30; %30 FPS
 
-%dt=0.0133;
-%song=song(1:Fs*dt:end,:);
-%size(song);
-%sound(song, Fs);
+signal=song(1:2:end,1);
 
-%Y=fftshift(abs(fft(song)));
-%Y=song;
-%signal=fftshift(abs(Y(:,1)));
+a=[];
+for i=r/2+1:r/2:length(signal)-r/2-1
+    a=[a, abs(fft(signal((i-r/2):(i+r/2))))];
+end
 
-Y=spectrogram(song(:,2));
-signal=abs(Y(:,1));
+A=[];
+figure
+sound(song, Fs);
+for i=1:(tf-ts)*30-2
+    
+    temp=(a(:,i));
+    %temp(temp<3)=0;
+    temp=max(temp);
+    A=[A, temp];
+    if i<100
+        subplot(2,1,1)
+        plot(A, 'r', 'linewidth', 2)
+    end
+    if i>100
+        subplot(2,1,1)
+        plot(A(end-100:end), 'r', 'linewidth', 2)
+    end
+    
+    subplot(2,1,2)
+    plot(0, 'rd', 'linewidth', 1+2*A(end)/500)
+    
+    pause(1/38)
+end
 
-spectrogram(song(:,2))
-
-%plot((1:length(signal)), signal);
-
-% figure('Position', [100, 50, 1200, 720]);
-% for i=1:length(Y(:,1))
-%     t=i*dt;
-%     plot((1:length(signal)).*dt, signal); 
-%     hold on
-%     plot(t, abs(Y(i,1)), 'ro')
-%     %ylim([0, 5000])
-%     pause(dt)
-%     hold off
-% end
-
-
+%%
+figure
+plot(0, 'ro', 'linewidth', 2)
 
 
 
