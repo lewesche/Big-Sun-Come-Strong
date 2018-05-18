@@ -15,7 +15,7 @@ M0=800;                         %Obrital Mass
 x0=0; y0=0; z0=0;               %Mass Fixed Location
 Particles=1000;                 %Number of Particles
 dt=1/30;                      %Time step (sec)
-run_time=80;                   %Run Time (sec)
+run_time=30;                   %Run Time (sec)
 D=3;                            %Dimesions (2 or 3)
 Tv=10;                          %Time to switch to 3D view (sec)
 
@@ -148,7 +148,7 @@ if D==3
 
     v=VideoWriter('BSCS_Test3.avi','Uncompressed AVI');
     v.FrameRate = 30;
-    %v.Quality = 100;
+    v.Quality = 100;
     open(v)
     writeVideo(v,F)
     close(v)
