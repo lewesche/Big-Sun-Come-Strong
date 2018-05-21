@@ -168,8 +168,8 @@ clc
 
 
 [song, Fs] = audioread('09 Coronus, The Terminator.mp3');
-ts=1/Fs+100;
-tf=120;
+ts=1/Fs+110;
+tf=130;
 [song, Fs] = audioread('09 Coronus, The Terminator.mp3', [ts*Fs, tf*Fs]);
 
 
@@ -183,9 +183,10 @@ for i=r/2+1:r/2:length(signal)-r/2-1
     a=[a, abs(fft(signal((i-r/2):(i+r/2))))];
 end
 
-A=[];
+A=[]; scl=0;
 figure
 sound(song, Fs);
+[sx, sy, sz]=sphere(15);
 for i=1:(tf-ts)*30-1
     
     temp=(a(:,i));
@@ -207,8 +208,14 @@ for i=1:(tf-ts)*30-1
         axis([0,120,0,1000])
     end
     
+    
+    scl=(scl+(0.1*A(end)/500).^2)*(exp(-scl))^(0.01);
+    exp(-scl)
+    
     subplot(3,1,3)
-    plot(0, 'rd', 'MarkerFaceColor', 'r', 'linewidth', 1+(2*A(end)/500)^2)
+%     plot(0, 'ro', 'MarkerFaceColor', 'r', 'linewidth', 2+scl)
+    s=surf(scl*sx, scl*sy, scl*sz); camlight; lighting phong; s.EdgeColor = 'none'; grid off
+    axis([-1, 1, -1, 1, -1, 1])
     title(num2str(round(i/30)))
     
     pause(1/90)
